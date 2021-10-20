@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../constants.dart';
+import 'package:food_delivery_app/constants/constants.dart';
 
 // ignore: must_be_immutable
 class CustomBotNavigationIcon extends StatelessWidget {

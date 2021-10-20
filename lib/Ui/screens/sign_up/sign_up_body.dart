@@ -8,7 +8,7 @@ import 'package:food_delivery_app/Ui/widgets/or_divider.dart';
 import 'package:food_delivery_app/Ui/widgets/password_text_field.dart';
 import 'package:food_delivery_app/services/perform_loign.dart';
 
-import '../../../constants.dart';
+import '../../../constants/constants.dart';
 import '../custom_background.dart';
 
 // ignore: must_be_immutable

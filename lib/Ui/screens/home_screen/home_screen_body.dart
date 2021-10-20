@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:food_delivery_app/Ui/widgets/bottom_navigation/bot_nav_bar.dart';
 import '../custom_background.dart';
 import 'components/category.dart';
 import 'components/food_list.dart';
@@ -52,7 +51,6 @@ class HomeScreenBody extends StatelessWidget {
           ),
         ),
       ),
-      Expanded(child: CustomBottomNavigationBar(size: size)),
     ]);
   }
 }

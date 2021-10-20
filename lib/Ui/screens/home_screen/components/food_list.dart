@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Models/food_model.dart';
-import '../../../../constants.dart';
+import '../../../../constants/constants.dart';
 import '../../food_detail_screen/food_detail_screen.dart';
 
 class FoodList extends StatelessWidget {

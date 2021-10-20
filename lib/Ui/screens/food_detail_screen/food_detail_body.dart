@@ -4,7 +4,7 @@ import 'package:food_delivery_app/Ui/widgets/button.dart';
 import 'package:food_delivery_app/services/firebase_auth.dart';
 
 import '../../../Streams/counter.dart';
-import '../../../constants.dart';
+import '../../../constants/constants.dart';
 import '../custom_background.dart';
 
 class FoodDetailBody extends StatelessWidget {

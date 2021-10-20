@@ -3,9 +3,9 @@ import 'package:food_delivery_app/services/firebase_auth.dart';
 
 import '../splash_screen/splash_screen.dart';
 
-class UserProfile extends StatelessWidget {
+class ProfileScreen extends StatelessWidget {
   final FirebaseService _firebaseService = FirebaseService();
-  UserProfile({Key? key}) : super(key: key);
+  ProfileScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

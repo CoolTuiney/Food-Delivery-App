@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:flutter/material.dart';
 import '../Models/food_model.dart';
 import '../Models/user_model.dart';
-import '../constants.dart';
+import '../constants/constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {

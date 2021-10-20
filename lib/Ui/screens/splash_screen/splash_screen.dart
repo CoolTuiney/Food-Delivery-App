@@ -1,10 +1,11 @@
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:flutter/material.dart';
+import 'package:food_delivery_app/Navigation/my_home_page.dart';
 import 'package:food_delivery_app/services/firebase_auth.dart';
 
-import '../../../constants.dart';
-import '../home_screen/home_screen.dart';
+import '../../../constants/constants.dart';
+
 import '../login/login_screen.dart';
 
 import 'package:shimmer/shimmer.dart';
@@ -30,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     future: _firebaseService.getCurrentUser(),
                     builder: (context, AsyncSnapshot<_auth.User?> snapshot) {
                       if (snapshot.hasData) {
-                        return const HomeScreen();
+                        return const MyHomePage();
                       } else {
                         return const LoginScreen();
                       }

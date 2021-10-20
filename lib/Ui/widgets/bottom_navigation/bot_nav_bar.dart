@@ -108,7 +108,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                     setState(() {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (cotext) {
-                        return UserProfile();
+                        return ProfileScreen();
                       }));
                     });
                   },
