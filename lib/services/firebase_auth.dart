@@ -1,8 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:flutter/material.dart';
-import 'package:food_delivery_app/Models/user_model.dart';
-import 'package:food_delivery_app/constants.dart';
+import '../Models/food_model.dart';
+import '../Models/user_model.dart';
+import '../constants.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class FirebaseService {
@@ -108,6 +109,7 @@ class FirebaseService {
     return (docs.isEmpty) ? true : false;
   }
 
+  //Adding user food item to cart in database
   Future<void> addCartToDb(String foods, int quantity) async {
     final email = await getCurrentUser().then((value) => value!.email);
 
@@ -116,6 +118,56 @@ class FirebaseService {
         .doc(email)
         .collection('Cart')
         .doc(foods)
-        .set({'cart': foods, 'quantity': quantity});
+        .set({'food_id': foods, 'quantity': quantity});
+  }
+
+  Future<Food> getFoodDetails(String docId) async {
+    QuerySnapshot<Map<String, dynamic>>? snapshot = await _firebaseFirestore
+        .collection('Foods')
+        .where('name', isEqualTo: docId)
+        .get();
+    var doc = snapshot.docs[0];
+    Food food = Food(
+        name: doc['name'],
+        category: doc['category'],
+        photoUrl: doc['url'],
+        price: doc['price'],
+        discount: doc['discount'],
+        discription: doc['discription']);
+    return food;
+  }
+
+  Future<List<Food>> getFood() async {
+    List<Food> foodList = [];
+    QuerySnapshot<Map<String, dynamic>>? snapshot =
+        await _firebaseFirestore.collection("Foods").get();
+
+    var docList = snapshot.docs;
+    for (var doc in docList) {
+      Food food = Food(
+          name: doc['name'],
+          category: doc['category'],
+          photoUrl: doc['url'],
+          price: doc['price'],
+          discount: doc['discount'],
+          discription: doc['discription']);
+      foodList.add(food);
+    }
+    return foodList;
+  }
+
+  Future<List<Map<String, dynamic>>> getCart() async {
+    List<Map<String, dynamic>> cart = [];
+    var currentUser = await getCurrentUser();
+    var snapshot = await _firebaseFirestore
+        .collection("Users")
+        .doc(currentUser!.email)
+        .collection('Cart')
+        .get();
+    var docList = snapshot.docs;
+    for (var doc in docList) {
+      cart.add({'foodId': doc['food_id'], 'quantity': doc['quantity']});
+    }
+    return cart;
   }
 }
