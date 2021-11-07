@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Models/food_model.dart';
 import 'package:food_delivery_app/Ui/widgets/button.dart';
-import 'package:food_delivery_app/services/firebase_auth.dart';
-
-import '../../../Streams/counter.dart';
+import 'package:food_delivery_app/provider/quantity_provider.dart';
+import 'package:food_delivery_app/repository/cart_repository.dart';
+import 'package:provider/provider.dart';
 import '../../../constants/constants.dart';
-import '../custom_background.dart';
+import '../../widgets/custom_background.dart';
 
 class FoodDetailBody extends StatelessWidget {
   final Food food;
@@ -18,10 +18,11 @@ class FoodDetailBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final FirebaseService _firebaseService = FirebaseService();
     final Size size = MediaQuery.of(context).size;
     final discountPrice = food.price! - (food.price! * (food.discount! / 100));
-    final Counterbloc _counterBloc = Counterbloc();
+    final _quantityProvider =
+        Provider.of<QuantityProvider>(context, listen: true);
+    final _cartRepository = CartRepository();
     return Stack(
       children: [
         CustomBackground(size: size),
@@ -193,23 +194,17 @@ class FoodDetailBody extends StatelessWidget {
                             border:
                                 Border.all(color: Colors.black87, width: 2)),
                         child: Center(
-                          child: StreamBuilder<int>(
-                              initialData: 1,
-                              stream: _counterBloc.counterStream,
-                              builder: (context, snapshot) {
-                                return Text(
-                                  '${snapshot.data}',
-                                  style: const TextStyle(
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                );
-                              }),
-                        ),
+                            child: Text(
+                          '${context.read<QuantityProvider>().getQuantity}',
+                          style: const TextStyle(
+                              color: Colors.black87,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                        )),
                       ),
                       IconButton(
                           onPressed: () {
-                            _counterBloc.eventSink.add(CounterAction.decrement);
+                            _quantityProvider.decrementQuantity();
                           },
                           icon: const Icon(
                             Icons.remove_circle_outline,
@@ -217,7 +212,7 @@ class FoodDetailBody extends StatelessWidget {
                           )),
                       IconButton(
                           onPressed: () {
-                            _counterBloc.eventSink.add(CounterAction.increment);
+                            _quantityProvider.incrementQuantity();
                           },
                           icon: const Icon(
                             Icons.add_circle_outline,
@@ -232,8 +227,8 @@ class FoodDetailBody extends StatelessWidget {
                     size: size,
                     text: 'Add To Cart',
                     onPress: () {
-                      _firebaseService.addCartToDb(
-                          food.name!, _counterBloc.getCounter);
+                      _cartRepository.addItemToCart(food.name!,
+                          context.read<QuantityProvider>().getQuantity);
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           duration: Duration(seconds: 2),
                           backgroundColor: ConstantColor.orange,

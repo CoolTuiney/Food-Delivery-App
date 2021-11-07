@@ -156,18 +156,60 @@ class FirebaseService {
     return foodList;
   }
 
-  Future<List<Map<String, dynamic>>> getCart() async {
-    List<Map<String, dynamic>> cart = [];
+  Future<Stream<QuerySnapshot<Map<String, dynamic>>>> getCart() async {
     var currentUser = await getCurrentUser();
-    var snapshot = await _firebaseFirestore
+    var snapshot = _firebaseFirestore
         .collection("Users")
         .doc(currentUser!.email)
         .collection('Cart')
-        .get();
-    var docList = snapshot.docs;
-    for (var doc in docList) {
-      cart.add({'foodId': doc['food_id'], 'quantity': doc['quantity']});
-    }
-    return cart;
+        .snapshots();
+    return snapshot;
+  }
+
+  void addItemToCart(String foodName, int quantity) async {
+    var currentUser = await getCurrentUser();
+    _firebaseFirestore
+        .collection("Users")
+        .doc(currentUser!.email)
+        .collection('Cart')
+        .doc(foodName)
+        .set({'food_id': foodName, 'quantity': quantity});
+  }
+
+  void removeItemFromCart(String foodName) async {
+    var currentuser = await getCurrentUser();
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentuser!.email)
+        .collection('Cart')
+        .doc(foodName)
+        .delete();
+  }
+
+  Future<Food> searchFoodItemById(String id) async {
+    var food = _firebaseFirestore
+        .collection('Foods')
+        .where('name', isEqualTo: id)
+        .get()
+        .then((doc) => Food(
+            name: doc.docs[0]['name'],
+            category: doc.docs[0]['category'],
+            photoUrl: doc.docs[0]['url'],
+            price: doc.docs[0]['price'],
+            discount: doc.docs[0]['discount'],
+            discription: doc.docs[0]['discription']));
+    var f = await food;
+
+    return food;
+  }
+
+  void updateQuantityOfCartItem(String id, int quantity) async {
+    var currentUser = await getCurrentUser();
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .collection('Cart')
+        .doc(id)
+        .update({'quantity': quantity});
   }
 }

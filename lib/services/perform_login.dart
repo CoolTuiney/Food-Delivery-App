@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Ui/screens/home_screen/home_screen.dart';
-import 'firebase_auth.dart';
+import 'firebase_service.dart';
 
 class PerfromLogin {
   final FirebaseService _firebaseSerivice = FirebaseService();

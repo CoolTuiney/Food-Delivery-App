@@ -38,6 +38,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: TextFormField(
+          textCapitalization: (widget.textHint == 'Email')
+              ? TextCapitalization.none
+              : TextCapitalization.words,
           autofillHints: const [AutofillHints.email],
           validator:
               (widget.textHint == 'Email') ? validateEmail : validateName,

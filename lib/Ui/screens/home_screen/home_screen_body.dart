@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../custom_background.dart';
+import '../../widgets/custom_background.dart';
 import 'components/category.dart';
 import 'components/food_list.dart';
 import 'components/home_screen_appbar.dart';

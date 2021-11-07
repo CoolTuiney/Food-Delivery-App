@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:food_delivery_app/Models/food_model.dart';
-import 'package:food_delivery_app/Streams/food_cart.dart';
+import 'package:food_delivery_app/Models/cart_model.dart';
+import 'package:food_delivery_app/repository/cart_repository.dart';
+
+import 'package:provider/provider.dart';
 import '../custom_background.dart';
 
 class CartScreenBody extends StatefulWidget {
@@ -11,18 +13,15 @@ class CartScreenBody extends StatefulWidget {
 }
 
 class _CartScreenBodyState extends State<CartScreenBody> {
-  final CartBloc _cartBloc = CartBloc();
-
   @override
   void initState() {
-    _cartBloc.eventSink.add(CartAction.fetch);
-
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final foodCart = Provider.of<List<Cart>>(context);
 
     return Column(
       children: [
@@ -40,36 +39,18 @@ class _CartScreenBodyState extends State<CartScreenBody> {
           ),
         ),
         Expanded(
-          child: StreamBuilder(
-              stream: _cartBloc.cartStream,
-              builder: (context, AsyncSnapshot<List<Food>> snapshot) {
-                debugPrint('streambuilder started');
-                if (snapshot.hasError) {
-                  debugPrint('has error');
-                  return Text('${snapshot.error}');
-                }
-                if (snapshot.hasData) {
-                  debugPrint('has data');
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, int index) {
-                              debugPrint(snapshot.data![index].name);
-                              return CartBuilder(food: snapshot.data![index]);
-                            }),
-                      ),
-                    ],
-                  );
+          child: ListView.builder(
+              itemCount: foodCart.length,
+              itemBuilder: (context, index) {
+                if (foodCart.isNotEmpty) {
+                  return CartBuilder(food: foodCart[index]);
                 } else {
-                  debugPrint('has else');
-                  return const Align(
-                      alignment: Alignment.center,
-                      child: CircularProgressIndicator());
+                  return const Center(
+                    child: Text('Cart is Empty'),
+                  );
                 }
               }),
-        )
+        ),
       ],
     );
   }
@@ -77,7 +58,7 @@ class _CartScreenBodyState extends State<CartScreenBody> {
 
 // ignore: must_be_immutable
 class CartBuilder extends StatelessWidget {
-  Food food;
+  Cart food;
   CartBuilder({
     Key? key,
     required this.food,
@@ -85,101 +66,140 @@ class CartBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(food.name);
+    final discountPrice = food.price! - (food.price! * (food.discount! / 100));
+    final _cartRepository = CartRepository();
     return Column(
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Image.network('${food.photoUrl}')),
-              const SizedBox(
-                width: 10,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '${food.name}',
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 15),
-                  ),
-                  Row(
-                    children: const [
-                      Icon(
-                        Icons.access_time_outlined,
-                        size: 23,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        '35-45 mins',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                      VerticalDivider(
-                        thickness: 1,
-                        indent: 3,
-                        endIndent: 3,
-                        color: Colors.black,
-                      ),
-                      Icon(
-                        Icons.star_border,
-                        size: 23,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        '4.2',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      Container(
-                        width: 40,
-                        height: 30,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border:
-                                Border.all(color: Colors.black87, width: 2)),
-                        child: const Center(
-                          child: Text(
-                            '0',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 15),
+          child: IntrinsicHeight(
+            child: Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: SizedBox(
+                      width: 100,
+                      height: 100,
+                      child:
+                          Image.network('${food.photoUrl}', fit: BoxFit.fill)),
+                ),
+                const SizedBox(
+                  width: 10,
+                ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '${food.name}',
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    Row(
+                      children: const [
+                        Icon(
+                          Icons.access_time_outlined,
+                          size: 23,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '35-45 mins',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        VerticalDivider(
+                          thickness: 1,
+                          indent: 3,
+                          endIndent: 3,
+                          color: Colors.black,
+                        ),
+                        Icon(
+                          Icons.star_border,
+                          size: 23,
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '4.2',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        Container(
+                          width: 40,
+                          height: 30,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(5),
+                              border:
+                                  Border.all(color: Colors.black87, width: 2)),
+                          child: Center(
+                            child: Text(
+                              food.quantity.toString(),
+                              style: const TextStyle(
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15),
+                            ),
                           ),
                         ),
-                      ),
-                      IconButton(
-                          onPressed: () {},
-                          icon: const Icon(
-                            Icons.remove_circle_outline,
-                            size: 30,
-                          )),
-                      IconButton(
-                          onPressed: () {},
+                        IconButton(
+                            onPressed: () {
+                              _cartRepository.decrementCart(
+                                  food.name!, food.quantity!);
+                            },
+                            icon: const Icon(
+                              Icons.remove_circle_outline,
+                              size: 30,
+                            )),
+                        IconButton(
+                          onPressed: () {
+                            _cartRepository.incrementCart(
+                                food.name!, food.quantity!);
+                          },
                           icon: const Icon(
                             Icons.add_circle_outline,
                             size: 30,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                          alignment: Alignment.topRight,
+                          child: InkWell(
+                            onTap: () =>
+                                _cartRepository.removeItemFromCart(food.name!),
+                            child: Icon(
+                              Icons.close,
+                              color: Colors.grey.shade700,
+                            ),
                           )),
+                      Text(
+                        '₹ $discountPrice',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      ),
                     ],
                   ),
-                ],
-              ),
-            ],
+                )
+              ],
+            ),
           ),
         ),
         const Divider(

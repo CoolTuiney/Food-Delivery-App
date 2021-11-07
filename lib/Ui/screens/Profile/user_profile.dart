@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_delivery_app/services/firebase_auth.dart';
+import 'package:food_delivery_app/services/firebase_service.dart';
 
 import '../splash_screen/splash_screen.dart';
 

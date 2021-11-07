@@ -16,7 +16,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _currentIndex = 0;
   final _inactiveColor = Colors.grey;
-  final _activeColor = Colors.white;
+  final _activeColor = ConstantColor.orange;
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildBottomBar() {
     return CustomAnimatedBottomBar(
-      containerHeight: 70,
+      containerHeight: 65,
       backgroundColor: Colors.white,
       selectedIndex: _currentIndex,
       showElevation: true,
@@ -66,7 +66,7 @@ class _MyHomePageState extends State<MyHomePage> {
         BottomNavyBarItem(
           icon: const Icon(Icons.search_outlined),
           title: const Text(
-            'Search ',
+            'Search',
           ),
           activeColor: _activeColor,
           inactiveColor: _inactiveColor,

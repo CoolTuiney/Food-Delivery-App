@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Models/food_model.dart';
+import 'package:food_delivery_app/provider/quantity_provider.dart';
+import 'package:provider/provider.dart';
 
 import 'food_detail_body.dart';
 
@@ -15,9 +17,12 @@ class FoodDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FoodDetailBody(
-        tag: tag,
-        food: food,
+      body: ChangeNotifierProvider(
+        create: (_) => QuantityProvider(),
+        child: FoodDetailBody(
+          tag: tag,
+          food: food,
+        ),
       ),
     );
   }
