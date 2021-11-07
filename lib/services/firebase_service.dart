@@ -198,7 +198,6 @@ class FirebaseService {
             price: doc.docs[0]['price'],
             discount: doc.docs[0]['discount'],
             discription: doc.docs[0]['discription']));
-    var f = await food;
 
     return food;
   }
