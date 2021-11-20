@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Models/cart_model.dart';
+import 'package:food_delivery_app/constants/constants.dart';
 import 'package:food_delivery_app/repository/cart_repository.dart';
 
 import 'package:provider/provider.dart';
@@ -12,7 +13,8 @@ class CartScreenBody extends StatefulWidget {
   State<CartScreenBody> createState() => _CartScreenBodyState();
 }
 
-class _CartScreenBodyState extends State<CartScreenBody> {
+class _CartScreenBodyState extends State<CartScreenBody>
+    with AutomaticKeepAliveClientMixin {
   @override
   void initState() {
     super.initState();
@@ -22,7 +24,7 @@ class _CartScreenBodyState extends State<CartScreenBody> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final foodCart = Provider.of<List<Cart>>(context);
-
+    super.build(context);
     return Column(
       children: [
         CustomBackground(
@@ -54,6 +56,9 @@ class _CartScreenBodyState extends State<CartScreenBody> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
 
 // ignore: must_be_immutable
@@ -183,9 +188,14 @@ class CartBuilder extends StatelessWidget {
                           child: InkWell(
                             onTap: () =>
                                 _cartRepository.removeItemFromCart(food.name!),
-                            child: Icon(
-                              Icons.close,
-                              color: Colors.grey.shade700,
+                            child: Tooltip(
+                              decoration: BoxDecoration(color: ConstantColor.orange,borderRadius: BorderRadius.circular(10)),
+                              triggerMode: TooltipTriggerMode.longPress,
+                              message: 'Remove Cart',
+                              child: Icon(
+                                Icons.close,
+                                color: Colors.grey.shade700,
+                              ),
                             ),
                           )),
                       Text(

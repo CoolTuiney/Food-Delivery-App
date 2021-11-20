@@ -41,13 +41,19 @@ class _CustomTextFieldState extends State<CustomTextField> {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: TextFormField(
+          keyboardType: (widget.textHint == 'Mobile No.')
+              ? TextInputType.number
+              : TextInputType.text,
           style: TextStyle(color: widget.color, fontSize: 18),
           textCapitalization: (widget.textHint == 'Email')
               ? TextCapitalization.none
               : TextCapitalization.words,
           autofillHints: const [AutofillHints.email],
-          validator:
-              (widget.textHint == 'Email') ? validateEmail : validateName,
+          validator: (widget.textHint == 'Email')
+              ? validateEmail
+              : (widget.textHint == 'Mobile No.')
+                  ? validateMobileNo
+                  : validateName,
           onChanged: widget.onPress,
           decoration: InputDecoration(
             border: InputBorder.none,
@@ -97,6 +103,28 @@ class _CustomTextFieldState extends State<CustomTextField> {
         isValidate = true;
       });
       return null;
+    }
+  }
+
+  String? validateMobileNo(String? value) {
+    Pattern pattern = '^[+]*[/0-9]*';
+    String val1 = value!.replaceAll(' ', '');
+    RegExp regExp = RegExp(pattern.toString());
+    if (regExp.hasMatch(val1) && (val1.length == 10 || val1.length == 12)) {
+      setState(() {
+        isValidate = true;
+      });
+      return null;
+    } else if (val1.isEmpty) {
+      setState(() {
+        isValidate = false;
+      });
+      return 'Mobile no. can\t be empty';
+    } else {
+      setState(() {
+        isValidate = false;
+      });
+      return 'Invalid input';
     }
   }
 }

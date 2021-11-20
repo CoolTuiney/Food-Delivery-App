@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:flutter/material.dart';
+import 'package:food_delivery_app/Ui/screens/splash_screen/splash_screen.dart';
 import '../Models/food_model.dart';
 import '../Models/user_model.dart';
 import '../constants/constants.dart';
@@ -79,10 +80,25 @@ class FirebaseService {
         await _googleSignIn.signOut();
       }
       await _firebaseAuth.signOut();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SplashScreen()),
+      );
     } on Exception catch (e) {
       debugPrint("$e");
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error signing out. Try again.')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: ConstantColor.orange,
+          content: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Error while trying to signing out',
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.8,
+                  fontSize: 15),
+            ),
+          )));
     }
   }
 
@@ -120,6 +136,7 @@ class FirebaseService {
         .doc(foods)
         .set({'food_id': foods, 'quantity': quantity});
   }
+
 
   Future<Food> getFoodDetails(String docId) async {
     QuerySnapshot<Map<String, dynamic>>? snapshot = await _firebaseFirestore
@@ -210,5 +227,16 @@ class FirebaseService {
         .collection('Cart')
         .doc(id)
         .update({'quantity': quantity});
+  }
+
+  void updateUserName(String firstName,String lastName) async{
+    String name = firstName +" "+ lastName;
+    var currentUser = await getCurrentUser();
+    _firebaseFirestore.collection('Users').doc(currentUser!.email).update({'name': name});
+  }
+  void updateUserMobile(int number) async{
+  
+    var currentUser = await getCurrentUser();
+    _firebaseFirestore.collection('Users').doc(currentUser!.email).update({'mobile_no': number});
   }
 }

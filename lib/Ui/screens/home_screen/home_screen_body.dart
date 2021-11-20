@@ -4,11 +4,17 @@ import 'components/category.dart';
 import 'components/food_list.dart';
 import 'components/home_screen_appbar.dart';
 
-class HomeScreenBody extends StatelessWidget {
+class HomeScreenBody extends StatefulWidget {
   const HomeScreenBody({
     Key? key,
   }) : super(key: key);
 
+  @override
+  State<HomeScreenBody> createState() => _HomeScreenBodyState();
+}
+
+class _HomeScreenBodyState extends State<HomeScreenBody>
+    with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -24,10 +30,14 @@ class HomeScreenBody extends StatelessWidget {
       'Chicken',
       'Spicy',
     ];
+    super.build(context);
     return Column(children: [
       CustomBackground(
         size: size,
-        widget: HomeScreenAppBar(size: size),
+        widget: HomeScreenAppBar(
+          size: size,
+          con: context,
+        ),
       ),
       Categories(size: size, categories: categories),
       Expanded(
@@ -53,4 +63,7 @@ class HomeScreenBody extends StatelessWidget {
       ),
     ]);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
