@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:flutter/material.dart';
+import 'package:food_delivery_app/Models/cart_model.dart';
 import 'package:food_delivery_app/Ui/screens/splash_screen/splash_screen.dart';
 import '../Models/food_model.dart';
 import '../Models/user_model.dart';
@@ -137,7 +138,6 @@ class FirebaseService {
         .set({'food_id': foods, 'quantity': quantity});
   }
 
-
   Future<Food> getFoodDetails(String docId) async {
     QuerySnapshot<Map<String, dynamic>>? snapshot = await _firebaseFirestore
         .collection('Foods')
@@ -229,14 +229,73 @@ class FirebaseService {
         .update({'quantity': quantity});
   }
 
-  void updateUserName(String firstName,String lastName) async{
-    String name = firstName +" "+ lastName;
+  void updateUserName(String firstName, String lastName) async {
+    String name = firstName + " " + lastName;
     var currentUser = await getCurrentUser();
-    _firebaseFirestore.collection('Users').doc(currentUser!.email).update({'name': name});
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .update({'name': name});
   }
-  void updateUserMobile(int number) async{
-  
+
+  void updateUserMobile(int number) async {
     var currentUser = await getCurrentUser();
-    _firebaseFirestore.collection('Users').doc(currentUser!.email).update({'mobile_no': number});
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .update({'mobile_no': number});
+  }
+
+  void addToWhishList(String name) async {
+    var currentUser = await getCurrentUser();
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .collection('Wishlist')
+        .doc(name)
+        .set({'food_name': name});
+  }
+
+  void removeFromWhishList(String name) async {
+    var currentUser = await getCurrentUser();
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .collection('Wishlist')
+        .doc(name)
+        .delete();
+  }
+
+  Future<bool> checkWishlist(String name) async {
+    var currentUser = await getCurrentUser();
+    var doc = await _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .collection('Wishlist')
+        .where('food_name', isEqualTo: name)
+        .get();
+
+    return (doc.docs.isEmpty) ? false : true;
+  }
+
+  Future<Stream> getWishlist() async {
+    var currentUser = await getCurrentUser();
+    return _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .collection('Wishlist')
+        .snapshots();
+  }
+
+  void purchaseOrder(List<Cart> cartList) async {
+    var currentUser = await getCurrentUser();
+    Map<String, dynamic> map = <String, dynamic>{};
+    map['foodList'] = cartList;
+    _firebaseFirestore
+        .collection('Users')
+        .doc(currentUser!.email)
+        .collection('Order')
+        .doc()
+        .set(map);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Models/cart_model.dart';
+import 'package:food_delivery_app/Ui/widgets/custom_alert_box.dart';
 import 'package:food_delivery_app/constants/constants.dart';
 import 'package:food_delivery_app/repository/cart_repository.dart';
 
@@ -24,6 +25,22 @@ class _CartScreenBodyState extends State<CartScreenBody>
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final foodCart = Provider.of<List<Cart>>(context);
+
+    double calculateTotal() {
+      double unFixedSizeDiscountPrice;
+      double discountPrice;
+      double total = 0;
+      for (var food in foodCart) {
+        unFixedSizeDiscountPrice =
+            (food.price! - (food.price! * (food.discount! / 100))) *
+                food.quantity!;
+        discountPrice =
+            double.parse((unFixedSizeDiscountPrice).toStringAsFixed(1));
+        total += discountPrice;
+      }
+      return total;
+    }
+
     super.build(context);
     return Column(
       children: [
@@ -53,6 +70,53 @@ class _CartScreenBodyState extends State<CartScreenBody>
                 }
               }),
         ),
+        Container(
+          decoration: BoxDecoration(
+              border: Border(
+                  top: BorderSide(
+                      color: Colors.black12.withOpacity(0.1), width: 1))),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Text('Total:  ',
+                        style: TextStyle(fontSize: 20, color: Colors.black)),
+                    Text('${calculateTotal()} ',
+                        style: const TextStyle(
+                            fontSize: 25,
+                            color: Colors.black,
+                            letterSpacing: 0.9)),
+                  ],
+                ),
+                InkWell(
+                  onTap: () => showDialog(
+                      context: context,
+                      builder: (context) => CustomAlertBox(
+                            onPress: () {},
+                          )),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 15),
+                    decoration: BoxDecoration(
+                        color: ConstantColor.orange,
+                        borderRadius: BorderRadius.circular(15)),
+                    child: const Text(
+                      'Place Order',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 17,
+                          letterSpacing: 1),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        )
       ],
     );
   }
@@ -71,7 +135,10 @@ class CartBuilder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final discountPrice = food.price! - (food.price! * (food.discount! / 100));
+    double unFixedSizeDiscountPrice =
+        (food.price! - (food.price! * (food.discount! / 100))) * food.quantity!;
+    var discountPrice =
+        double.parse((unFixedSizeDiscountPrice).toStringAsFixed(1));
     final _cartRepository = CartRepository();
     return Column(
       children: [
@@ -189,7 +256,9 @@ class CartBuilder extends StatelessWidget {
                             onTap: () =>
                                 _cartRepository.removeItemFromCart(food.name!),
                             child: Tooltip(
-                              decoration: BoxDecoration(color: ConstantColor.orange,borderRadius: BorderRadius.circular(10)),
+                              decoration: BoxDecoration(
+                                  color: ConstantColor.orange,
+                                  borderRadius: BorderRadius.circular(10)),
                               triggerMode: TooltipTriggerMode.longPress,
                               message: 'Remove Cart',
                               child: Icon(

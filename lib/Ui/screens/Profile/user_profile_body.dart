@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:food_delivery_app/Ui/screens/Profile/components/decorated_list.dart';
 import 'package:food_delivery_app/Ui/screens/Profile/components/user_info.dart';
 import 'package:food_delivery_app/Ui/screens/Profile/pages/my_account.dart';
+import 'package:food_delivery_app/Ui/screens/Profile/pages/my_address.dart';
+import 'package:food_delivery_app/Ui/screens/Profile/pages/my_wishlist.dart';
 import 'package:food_delivery_app/Ui/widgets/custom_background.dart';
 
 import 'package:food_delivery_app/repository/user_repository.dart';
-
 
 class UserProfileBody extends StatefulWidget {
   const UserProfileBody({Key? key}) : super(key: key);
@@ -92,14 +93,22 @@ class _UserProfileBodyState extends State<UserProfileBody>
             icon: Icons.shopping_cart_outlined,
             textSize: textSize,
             iconSize: iconSize,
-            onPress: () {},
+            onPress: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MyWishlist(user: user))),
             title: 'My Wishlist',
           ),
           DecoratedListMenu(
             icon: Icons.location_on_outlined,
             textSize: textSize,
             iconSize: iconSize,
-            onPress: () {},
+            onPress: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => MyAddress(
+                          user: user,
+                        ))),
             title: 'My Address',
           ),
           DecoratedListMenu(

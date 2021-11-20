@@ -16,7 +16,7 @@ class MyAccount extends StatelessWidget {
   final UserRepository _userRepository = UserRepository();
   String firstName = '';
   String lastName = '';
-  String mobile_no = '';
+  String mobileNo = '';
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -27,6 +27,7 @@ class MyAccount extends StatelessWidget {
             CustomBackground(
               size: size,
               widget: UserInfo(
+                hasBackButton: true,
                 user: user,
               ),
             ),
@@ -84,7 +85,7 @@ class MyAccount extends StatelessWidget {
             Form(
                 key: _mobileNoKey,
                 child: textFields(size, 'Mobile No.', (val) {
-                  mobile_no = val;
+                  mobileNo = val;
                 })),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
@@ -94,7 +95,7 @@ class MyAccount extends StatelessWidget {
                   onPress: () {
                     bool isMobileValide = _mobileNoKey.currentState!.validate();
                     if (isMobileValide) {
-                      _userRepository.updateUserNumber(int.parse(mobile_no));
+                      _userRepository.updateUserNumber(int.parse(mobileNo));
                     }
                   }),
             )

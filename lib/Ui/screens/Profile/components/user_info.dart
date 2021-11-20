@@ -1,15 +1,17 @@
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as _auth;
 import 'package:food_delivery_app/provider/location_provider.dart';
 import 'package:provider/provider.dart';
+
 class UserInfo extends StatelessWidget {
   const UserInfo({
     Key? key,
     required this.user,
+    this.hasBackButton = false,
   }) : super(key: key);
 
   final _auth.User? user;
+  final bool hasBackButton;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,14 @@ class UserInfo extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Row(
           children: [
+            (hasBackButton)
+                ? IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(
+                      Icons.arrow_back_ios,
+                      color: Colors.white,
+                    ))
+                : const SizedBox(),
             CircleAvatar(
               backgroundColor: Colors.white,
               radius: 42,

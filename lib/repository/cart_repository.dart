@@ -4,6 +4,7 @@ import 'package:food_delivery_app/services/firebase_service.dart';
 
 class CartRepository {
   final FirebaseService _firebaseService = FirebaseService();
+
   StreamController<List<Cart>> controller = StreamController<List<Cart>>();
   Stream<List<Cart>> get stream => controller.stream;
 
@@ -31,7 +32,7 @@ class CartRepository {
 
   void addItemToCart(String foodName, int quantity) =>
       _firebaseService.addItemToCart(foodName, quantity);
-      
+
   void removeItemFromCart(String cartItemName) =>
       _firebaseService.removeItemFromCart(cartItemName);
 
@@ -46,4 +47,7 @@ class CartRepository {
       _firebaseService.updateQuantityOfCartItem(name, quantity - 1);
     }
   }
+
+  void purchaseOrder(List<Cart> cartList) =>
+      _firebaseService.purchaseOrder(cartList);
 }

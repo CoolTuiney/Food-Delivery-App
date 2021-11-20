@@ -3,11 +3,12 @@ import 'package:food_delivery_app/Models/food_model.dart';
 import 'package:food_delivery_app/Ui/widgets/button.dart';
 import 'package:food_delivery_app/provider/quantity_provider.dart';
 import 'package:food_delivery_app/repository/cart_repository.dart';
+import 'package:food_delivery_app/repository/wishlist_repo.dart';
 import 'package:provider/provider.dart';
 import '../../../constants/constants.dart';
 import '../../widgets/custom_background.dart';
 
-class FoodDetailBody extends StatelessWidget {
+class FoodDetailBody extends StatefulWidget {
   final Food food;
   final String tag;
   const FoodDetailBody({
@@ -17,9 +18,56 @@ class FoodDetailBody extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<FoodDetailBody> createState() => _FoodDetailBodyState();
+}
+
+class _FoodDetailBodyState extends State<FoodDetailBody>
+    with SingleTickerProviderStateMixin {
+  final WishlistRepository _wishlistRepository = WishlistRepository();
+  late AnimationController _controller;
+  late Animation<Color?> _colorAnimation;
+  late Animation<double> _sizeAnimation;
+  late bool isFav;
+  @override
+  void initState() {
+    _wishlistRepository.checkItemInWishlist(widget.food.name!).then((value) {
+      isFav = value;
+      (isFav) ? _controller.forward(from: 1) : _controller.reverse();
+    });
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 300), vsync: this);
+    _colorAnimation =
+        ColorTween(begin: Colors.grey, end: Colors.red).animate(_controller);
+    _sizeAnimation = TweenSequence(<TweenSequenceItem<double>>[
+      TweenSequenceItem(tween: Tween(begin: 40, end: 60), weight: 50),
+      TweenSequenceItem(tween: Tween(begin: 60, end: 40), weight: 50),
+    ]).animate(_controller);
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        setState(() {
+          isFav = true;
+        });
+      } else if (status == AnimationStatus.dismissed) {
+        setState(() {
+          isFav = false;
+        });
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final discountPrice = food.price! - (food.price! * (food.discount! / 100));
+    final discountPrice = widget.food.price! -
+        (widget.food.price! * (widget.food.discount! / 100));
     final _quantityProvider =
         Provider.of<QuantityProvider>(context, listen: true);
     final _cartRepository = CartRepository();
@@ -48,7 +96,7 @@ class FoodDetailBody extends StatelessWidget {
                 Align(
                   alignment: Alignment.topCenter,
                   child: Text(
-                    food.name!,
+                    widget.food.name!,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 25,
@@ -61,7 +109,7 @@ class FoodDetailBody extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Center(
                     child: Hero(
-                      tag: tag,
+                      tag: widget.tag,
                       child: Container(
                         height: size.height * 0.40,
                         decoration: BoxDecoration(
@@ -77,7 +125,7 @@ class FoodDetailBody extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.network(
-                            food.photoUrl!,
+                            widget.food.photoUrl!,
                             fit: BoxFit.fill,
                           ),
                         ),
@@ -89,14 +137,14 @@ class FoodDetailBody extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      food.name!,
+                      widget.food.name!,
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 20),
                     ),
                     Row(
                       children: [
                         Text(
-                          '${food.discount}% off',
+                          '${widget.food.discount}% off',
                           style: const TextStyle(
                               color: ConstantColor.orange,
                               fontWeight: FontWeight.bold,
@@ -106,7 +154,7 @@ class FoodDetailBody extends StatelessWidget {
                           width: 10,
                         ),
                         Text(
-                          '₹ ${food.price}.00',
+                          '₹ ${widget.food.price}.00',
                           style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
@@ -169,7 +217,7 @@ class FoodDetailBody extends StatelessWidget {
                 ),
                 SizedBox(
                     child: Text(
-                  food.discription!,
+                  widget.food.discription!,
                   maxLines: 5,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(color: Colors.black54, fontSize: 15),
@@ -218,6 +266,31 @@ class FoodDetailBody extends StatelessWidget {
                             Icons.add_circle_outline,
                             size: 40,
                           )),
+                      Expanded(
+                        child: AnimatedBuilder(
+                          animation: _controller,
+                          builder: (BuildContext context, child) {
+                            return IconButton(
+                                onPressed: () {
+                                  if (isFav) {
+                                    _controller.reverse();
+                                    _wishlistRepository.removeItemFromWishList(
+                                        widget.food.name!);
+                                  } else {
+                                    _controller.forward();
+
+                                    _wishlistRepository
+                                        .addItemToWishList(widget.food.name!);
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.favorite,
+                                  size: _sizeAnimation.value,
+                                  color: _colorAnimation.value,
+                                ));
+                          },
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -227,7 +300,8 @@ class FoodDetailBody extends StatelessWidget {
                     size: size,
                     text: 'Add To Cart',
                     onPress: () {
-                      _cartRepository.addItemToCart(food.name!,
+                      debugPrint(isFav.toString());
+                      _cartRepository.addItemToCart(widget.food.name!,
                           context.read<QuantityProvider>().getQuantity);
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           duration: Duration(seconds: 2),
